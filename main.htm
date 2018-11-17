@@ -1,0 +1,90 @@
+<div id="ddzr">
+</div>
+
+<style>
+ * {
+   box-sizing: border-box;
+ }
+
+ .pads {
+   display: grid;
+   grid-auto-columns: 150px;
+   grid-auto-rows: 150px;
+   margin: 0 auto;
+   padding-left: 25vw;
+ }
+
+ .single-pad {
+   color: #FFF;
+   background: #000;
+   border: 5px solid #FFF;
+   border-radius: 16px;
+   transition: .1s background;
+ }
+
+ .single-pad.played {
+   background: green;
+ }
+</style>
+
+<script src="https://unpkg.com/react@16.7.0-alpha.2/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16.7.0-alpha.2/umd/react-dom.development.js" crossorigin></script>
+<script src="./ui.js"></script>
+
+<script>
+ if (navigator.requestMIDIAccess) {
+	 console.log('This browser supports WebMIDI!')
+
+	 navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure)
+
+ } else {
+	 console.log('WebMIDI is not supported in this browser.')
+ }
+
+ function onMIDISuccess(midiAccess) {
+	 const inputs = midiAccess.inputs
+	 const outputs = midiAccess.outputs
+
+	 for (const input of midiAccess.inputs.values()) {
+	   input.onmidimessage = getMIDIMessage
+	 }
+ }
+
+ function onMIDIFailure() {
+	 document.querySelector('.step0').innerHTML = 'Error: Could not access MIDI devices. Connect a device and refresh to try again.'
+ }
+
+ function getMIDIMessage(message) {
+	 const command = message.data[0]
+	 const note = message.data[1]
+	 const velocity = (message.data.length > 2) ? message.data[2] : 0
+   // a velocity value might not be included with a noteOff command
+
+	 switch (command) {
+	   case 144: // noteOn
+	     if (velocity > 0) {
+	       noteOnListener(note, velocity)
+	     } else {
+	       noteOffListener(note)
+	     }
+	     break
+	   case 128: // noteOff
+	     noteOffCallback(note)
+	     break
+	     // we could easily expand this switch statement to cover other types of commands such as controllers or sysex
+	 }
+ }
+
+ function noteOnListener(note, velocity) {
+   window.noteOn(note, velocity)
+   /* console.log(velocity) */
+ }
+
+ function noteOffListener(note) {
+   /* console.log(note) */
+ }
+
+ function noteOffCallback(note) {
+   window.noteOn(-1)
+ }
+</script>
