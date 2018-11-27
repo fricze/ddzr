@@ -1,25 +1,20 @@
+import { parseMessage } from './parseMessage.js'
+
 const e = React.createElement
 const useState = React.useState
 const useEffect = React.useEffect
 
-const bounds = [0, 31]
+let keys
 
-const padsInLine = 12
+const notesNames = ['C', 'C#', 'D', 'D#', 'E', 'F',
+                    'F#', 'G', 'G#', 'A', 'A#', 'H']
+      .reverse()
 
 const range = (a, b) => (new Array(b - a + 1)).fill(0)
       .map((_, idx) => a + idx)
 
 const notez = range(0, 11).map(row => range(0, 7).map(col => ({ row, col })))
       .flat()
-
-const _part = (base, parts, by) =>
-      base.length > 0 ?
-      _part(base.slice(by), parts.concat([base.slice(0, by)]), by) :
-      parts
-
-const partition = (arr, by) => _part(arr, [], by)
-
-const pads = partition(range(...bounds), padsInLine)
 
 const useWindowKeys = () => {
     const [notesPlucked, pluckNote] = useState([{}])
@@ -33,6 +28,25 @@ const useWindowKeys = () => {
             { ...row,
               [e.key]: !row[e.key]
             }
+
+        if (notesPlucked[rowPlucked][e.key]) {
+            const note = notesNames[rowPlucked]
+            const noteMsg = 11 - rowPlucked
+
+            keys.send(parseMessage('noteon', {
+                note: 60 + noteMsg,
+                velocity: 127,
+                channel: 3
+            }))
+
+            setTimeout(_ => {
+                keys.send(parseMessage('noteoff', {
+                    note: 60 + noteMsg,
+                    velocity: 127,
+                    channel: 3
+                }))
+            }, 1000)
+        }
 
         pluckNote(notesPlucked)
     }
@@ -83,8 +97,6 @@ const useWindowKeys = () => {
     return {notesPlucked, inControl, rowPlucked}
 }
 
-const notesNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'H']
-
 const Notes = () => {
     const {notesPlucked, inControl, rowPlucked} = useWindowKeys()
 
@@ -127,3 +139,16 @@ const Notes = () => {
 
 const domContainer = document.querySelector('#piano')
 ReactDOM.render(e(Notes), domContainer)
+
+function onMIDISuccess(midiAccess) {
+    const outs = midiAccess.outputs
+    // take first midi output and assign
+    keys = outs.values().next().value
+    keys.open()
+}
+
+function onMIDIFailure(msg) {
+    console.log("Failed to get MIDI access - " + msg)
+}
+
+navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure)
