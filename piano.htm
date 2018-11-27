@@ -2,11 +2,20 @@
 </div>
 
 <style>
+ :root {
+   --main-bg-color: #EEE;
+ }
+
  * {
    box-sizing: border-box;
    font-family: Arial;
    margin: 0;
    padding: 0;
+   user-select: none;
+ }
+
+ body {
+   background: var(--main-bg-color);
  }
 
  #piano {
@@ -26,9 +35,9 @@
  .single-pad {
    color: #FFF;
    background: #000;
-   border: 5px solid #FFF;
+   border: 5px solid var(--main-bg-color);
    border-radius: 10px;
-   transition: .2s background;
+   transition: .3s background cubic-bezier(0.785, 0.135, 0.15, 0.86);
  }
 
  .single-pad.active-pad {
