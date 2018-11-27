@@ -1,0 +1,65 @@
+<div id="piano">
+</div>
+
+<style>
+ * {
+   box-sizing: border-box;
+   font-family: Arial;
+   margin: 0;
+   padding: 0;
+ }
+
+ #piano {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   justify-content: center;
+   padding-top: 80px;
+ }
+
+ .pads {
+   display: grid;
+   grid-auto-columns: 50px;
+   grid-auto-rows: 30px;
+ }
+
+ .single-pad {
+   color: #FFF;
+   background: #000;
+   border: 5px solid #FFF;
+   border-radius: 10px;
+   transition: .2s background;
+ }
+
+ .single-pad.active-pad {
+   background: #999;
+ }
+
+ .single-pad.played {
+   background: green;
+ }
+
+ @keyframes glowing {
+   0% { opacity: 1; }
+   40% { opacity: 0.5; }
+   60% { opacity: 0.5; }
+   100% { opacity: 1; }
+ }
+
+ .active-dot {
+   animation: glowing 1000ms infinite;
+   font-size: 34px;
+   position: relative;
+   top: -10px;
+   left: 31px;
+ }
+</style>
+
+<script src="https://unpkg.com/react@16.7.0-alpha.2/umd/react.development.js"
+        crossorigin>
+</script>
+<script src="https://unpkg.com/react-dom@16.7.0-alpha.2/umd/react-dom.development.js"
+        crossorigin>
+</script>
+<script src="./piano.js">
+</script>

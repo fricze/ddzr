@@ -19,7 +19,7 @@
    background: #000;
    border: 5px solid #FFF;
    border-radius: 16px;
-   transition: .1s background;
+   transition: .2s background;
  }
 
  .single-pad.played {
@@ -29,6 +29,7 @@
 
 <script src="https://unpkg.com/react@16.7.0-alpha.2/umd/react.development.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@16.7.0-alpha.2/umd/react-dom.development.js" crossorigin></script>
+<script src="./tone.js"></script>
 <script src="./ui.js"></script>
 
 <script>
@@ -75,8 +76,12 @@
 	 }
  }
 
+ const synth = new Tone.Synth().toMaster();
+
  function noteOnListener(note, velocity) {
    window.noteOn(note, velocity)
+   window.setNote(note, velocity)
+   synth.triggerAttackRelease(Tone.Frequency(note, 'midi').toNote(), '8n')
    /* console.log(velocity) */
  }
 
@@ -86,5 +91,7 @@
 
  function noteOffCallback(note) {
    window.noteOn(-1)
+   window.unsetNote(note)
  }
+
 </script>
